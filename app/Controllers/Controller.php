@@ -4,7 +4,10 @@ namespace App\Controllers;
 
 class Controller {
 
-    public function view($route) {
+    public function view($route, $data = []) {
+
+        // Destructurar el array
+        extract($data);
 
         if(file_exists("../resources/views/{$route}.php")) {
 
