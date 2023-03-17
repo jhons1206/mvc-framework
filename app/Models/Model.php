@@ -32,9 +32,23 @@ class Model {
         }
     }
 
-    public function query($sql) 
+    public function query($sql, $data = [], $params = null) 
     {
-        $this->query = $this->connection->query($sql);
+        if($data) {
+
+            if($data) {
+                
+            }
+
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bind_param($params, ...$data);
+            $stmt->execute();
+
+            $this->query = $stmt->get_result();
+        } else {
+            $this->query = $this->connection->query($sql);
+        }
+
         return $this;
     }
 
@@ -68,20 +82,16 @@ class Model {
             $operator = '=';
         }
 
-        $value = $this->connection->real_escape_string($value);
+        $sql = "SELECT * FROM {$this->table} WHERE {$column} {$operator} ?";
 
-        $sql = "SELECT * FROM {$this->table} WHERE {$column} {$operator} '{$value}'";
-
-        // return $sql;
-
-        $this->query($sql);
+        $this->query($sql, [$value], 's');
 
         return $this;
     }
 
     // Insertar registros DB
     public function create($data) {
-        // INSERT INTO contacts (name, email, phone) VALUES ('', '', '')
+
         $columns = array_keys($data);
         $columns = implode(', ', $columns);
 
