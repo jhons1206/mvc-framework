@@ -11,7 +11,7 @@ class HomeController extends Controller {
 
         $contactModel = new Contact();
 
-        return $contactModel->delete(15);
+        return $contactModel->where("name", "Jeremy Sandoval' OR 'a' = 'a")->get();
 
         return "Eliminado";
 
