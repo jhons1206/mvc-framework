@@ -11,10 +11,7 @@ class HomeController extends Controller {
 
         $contactModel = new Contact();
 
-        // return $contactModel->all();
-        $contactModel->delete(8);
-
-        return "Eliminado";
+        return $contactModel->all();
 
         return $this->view('home', [
             'title' => 'Home',
