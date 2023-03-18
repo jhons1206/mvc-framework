@@ -36,8 +36,8 @@ class Model {
     {
         if($data) {
 
-            if($data) {
-                
+            if($params == null) {
+                $params = str_repeat('s', count($data));
             }
 
             $stmt = $this->connection->prepare($sql);
@@ -71,8 +71,8 @@ class Model {
 
     public function find($id)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE id = {$id}";
-        return $this->query($sql)->first();
+        $sql = "SELECT * FROM {$this->table} WHERE id = ?";
+        return $this->query($sql, [$id], 'i')->first();
     }
 
     public function where($column, $operator, $value = null)
@@ -96,11 +96,12 @@ class Model {
         $columns = implode(', ', $columns);
 
         $values = array_values($data);
-        $values = "'" . implode("', '", $values) . "'";
 
-        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$values})";
+        // $values = "'" . implode("', '", $values) . "'";
 
-        $this->query($sql);
+        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES (" . str_repeat('?, ', count($values) - 1) . "?)";
+
+        $this->query($sql, $values);
         
         $insert_id = $this->connection->insert_id;
 
@@ -114,14 +115,17 @@ class Model {
 
         foreach($data as $key => $value) {
 
-            $fields[] = "{$key} = '{$value}'";
+            $fields[] = "{$key} = ?";
         }
 
         $fields = implode(', ', $fields);
 
-        $sql = "UPDATE {$this->table} SET {$fields} WHERE id = {$id}";
+        $sql = "UPDATE {$this->table} SET {$fields} WHERE id = ?";
 
-        $this->query($sql);
+        $values = array_values($data);
+        $values[] = $id;
+        
+        $this->query($sql, $values);
 
         return $this->find($id);
     }
@@ -129,8 +133,8 @@ class Model {
     // Eliminar registros DB
     public function delete($id)
     {
-        $sql = "DELETE FROM {$this->table} WHERE id = {$id}";
-        $this->query($sql);
+        $sql = "DELETE FROM {$this->table} WHERE id = ?";
+        $this->query($sql, [$id], 'i');
     }
 
 }
