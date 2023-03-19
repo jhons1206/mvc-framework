@@ -2,36 +2,56 @@
 
 namespace App\Controllers;
 
+use App\Models\Contact;
+
 class ContactController extends Controller
 {
     public function index()
     {
-        return $this->view('contacts.index');
+        $model = new Contact;
+        $contacts = $model->all();
+
+        // compact("contacts") => ["contacts" => $contacts]
+        return $this->view("contacts.index", compact("contacts"));
     }
 
     public function create()
     {
-        return 'Aquí se mostrará el formulario para crear un contacto';
+        return $this->view("contacts.create");
     }
 
     public function store()
     {
-        return 'Aquí se procesará el formulario para crear un contacto';
+        // Retornar parámetros del formulario
+        $data = $_POST;
+        $model = new Contact;
+        $model->create($data);
+        $this->redirect("/contacts");
     }
 
     public function show($id)
     {
-        return 'Aquí se mostrará el contacto con id: ' . $id;
+        $model = new Contact;
+        $contact = $model->find($id);
+
+        return $this->view("contacts.show", compact("contact"));
     }
 
     public function edit($id)
+    
     {
-        return 'Aquí se mostrará el formulario para editar el contacto con id: ' . $id;
+        $model = new Contact;
+        $contact = $model->find($id);
+
+        return $this->view("contacts.edit", compact("contact"));
     }
 
     public function update($id)
     {
-        return 'Aquí se procesará el formulario para editar el contacto con id: ' . $id;
+        $data = $_POST;
+        $model = new Contact;
+        $model->update($id, $data);
+        $this->redirect("/contacts/{$id}");
     }
 
     public function delete($id)

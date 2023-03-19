@@ -62,19 +62,23 @@ class Model {
         return $this->query->fetch_all(MYSQLI_ASSOC);
     }
 
-    // Consultas DB
+    // Consultas: Base de Datos
+    // --------------------------------------------------
+    // 1. Trae todos los registros de una tabla
     public function all() 
     {
         $sql = "SELECT * FROM {$this->table}";
         return $this->query($sql)->get();
     }
 
+    // 2. Trae registros por id
     public function find($id)
     {
         $sql = "SELECT * FROM {$this->table} WHERE id = ?";
         return $this->query($sql, [$id], 'i')->first();
     }
 
+    // 3. Trae registros por campo, condición y valor
     public function where($column, $operator, $value = null)
     {
         if($value == null) {
@@ -89,7 +93,7 @@ class Model {
         return $this;
     }
 
-    // Insertar registros DB
+    // 4. Insertar registros DB
     public function create($data) {
 
         $columns = array_keys($data);
@@ -108,7 +112,7 @@ class Model {
         return $this->find($insert_id);
     }
 
-    // Actualizar registros DB
+    // 5. Actualizar registros DB
     public function update($id, $data)
     {
         $fields = [];
@@ -130,7 +134,7 @@ class Model {
         return $this->find($id);
     }
 
-    // Eliminar registros DB
+    // 6. Eliminar registros DB
     public function delete($id)
     {
         $sql = "DELETE FROM {$this->table} WHERE id = ?";
