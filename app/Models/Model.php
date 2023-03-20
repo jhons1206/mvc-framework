@@ -62,6 +62,35 @@ class Model {
         return $this->query->fetch_all(MYSQLI_ASSOC);
     }
 
+    public function paginate($cant = 15) 
+    {
+        $page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+        $sql = "SELECT * FROM {$this->table} LIMIT " . ($page - 1) * $cant . ",{$cant}";
+
+        $data = $this->query($sql)->get();
+
+        $total = $this->query("SELECT COUNT(*) as total FROM {$this->table}")->first()['total'];
+
+        $uri = $_SERVER['REQUEST_URI'];
+        $uri = trim($uri, '/');
+
+        if(strpos($uri, '?')) {
+            $uri = substr($uri, 0, strpos($uri, '?'));
+        }
+
+        $last_page = ceil($total / $cant);
+
+        return [
+            'total' => $total,
+            'from' => ($page - 1) * $cant + 1,
+            'to' => ($page - 1) * $cant + count($data),
+            'next_page_url' => $page < $last_page ? '/' . $uri . '?page=' . $page + 1 : null,
+            'prev_page_url' => $page > 1 ? '/' . $uri . '?page=' . $page - 1 : null,
+            'data' => $data
+        ];
+    }
+
     // Consultas: Base de Datos
     // --------------------------------------------------
     // 1. Trae todos los registros de una tabla
