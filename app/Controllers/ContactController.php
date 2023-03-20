@@ -9,7 +9,7 @@ class ContactController extends Controller
     public function index()
     {
         $model = new Contact;
-        $contacts = $model->paginate(4);
+        $contacts = $model->paginate(3);
 
         // return $contacts;
 
