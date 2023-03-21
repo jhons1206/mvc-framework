@@ -11,10 +11,10 @@ class Model {
     protected $db_user = DB_USER;
     protected $db_pass = DB_PASS;
     protected $db_name = DB_NAME;
-
     protected $connection;
     protected $query;
     protected $table;
+    protected $sql, $data = [], $params = null;
 
     public function __construct() 
     {
@@ -54,11 +54,19 @@ class Model {
 
     public function first() 
     {
+        if(empty($this->query)) {
+            $this->query($this->sql, $this->data, $this->params);
+        }
+
         return $this->query->fetch_assoc();
     }
 
     public function get() 
     {
+        if(empty($this->query)) {
+            $this->query($this->sql, $this->data, $this->params);
+        }
+
         return $this->query->fetch_all(MYSQLI_ASSOC);
     }
 
@@ -66,11 +74,19 @@ class Model {
     {
         $page = isset($_GET['page']) ? $_GET['page'] : 1;
 
-        $sql = "SELECT * FROM {$this->table} LIMIT " . ($page - 1) * $cant . ",{$cant}";
+        if($this->sql) {
+            $sql = $this->sql . " LIMIT " . ($page - 1) *  $cant . ",{$cant}";
 
-        $data = $this->query($sql)->get();
+            $data = $this->query($sql, $this->data, $this->params)->get();
+        } else {
+            $sql = "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->table} LIMIT " . ($page - 1) * $cant . ",{$cant}";
 
-        $total = $this->query("SELECT COUNT(*) as total FROM {$this->table}")->first()['total'];
+            $data = $this->query($sql)->get();
+        }
+
+        // $total = $this->query("SELECT COUNT(*) as total FROM {$this->table}")->first()['total'];
+        $total = $this->query("SELECT FOUND_ROWS() as total")->first()['total'];
+
 
         $uri = $_SERVER['REQUEST_URI'];
         $uri = trim($uri, '/');
@@ -117,9 +133,11 @@ class Model {
             $operator = '=';
         }
 
-        $sql = "SELECT * FROM {$this->table} WHERE {$column} {$operator} ?";
+        $this->sql = "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->table} WHERE {$column} {$operator} ?";
 
-        $this->query($sql, [$value], 's');
+        $this->data[] = $value;
+
+        // $this->query($sql, [$value], 's');
 
         return $this;
     }
