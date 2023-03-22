@@ -9,7 +9,12 @@ class ContactController extends Controller
     public function index()
     {
         $model = new Contact;
-        
+
+        return $model->where('id', '>=', 2)
+        ->where('id', '<=', 12)            
+        ->where('name', '=', 'Luis Viera')            
+        ->get();
+    
         if(isset($_GET['search'])) {
             $contacts = $model->where('name', 'LIKE' , '%' . $_GET['search'] . '%')->paginate(3);
         } else {

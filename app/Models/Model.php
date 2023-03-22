@@ -133,9 +133,13 @@ class Model {
             $operator = '=';
         }
 
-        $this->sql = "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->table} WHERE {$column} {$operator} ?";
-
-        $this->data[] = $value;
+        if(empty($this->sql)) {
+            $this->sql = "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->table} WHERE {$column} {$operator} ?";
+            $this->data[] = $value;
+        } else {
+            $this->sql .= " AND {$column} {$operator} ?";
+            $this->data[] = $value;
+        }
 
         // $this->query($sql, [$value], 's');
 
