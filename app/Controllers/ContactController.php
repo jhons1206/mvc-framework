@@ -10,10 +10,10 @@ class ContactController extends Controller
     {
         $model = new Contact;
 
-        return $model->where('id', '>=', 2)
-        ->where('id', '<=', 12)            
-        ->where('name', '=', 'Luis Viera')            
-        ->get();
+        $model->where('id', '>=', 2)
+            ->where('id', '<=', 10)
+            ->orderBy('id')
+            ->paginate(3);
     
         if(isset($_GET['search'])) {
             $contacts = $model->where('name', 'LIKE' , '%' . $_GET['search'] . '%')->paginate(3);
